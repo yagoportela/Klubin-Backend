@@ -37,10 +37,14 @@ namespace DadosClientes
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IConfiguration configuration)
         {
 
-            app.UseSwagger();
+            app.UseSwagger(c => 
+            {
+                c.RouteTemplate = "api/swagger/{documentName}/swagger.json";
+            });
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/Prod/swagger/v1/swagger.json", "My API V1");
+                c.SwaggerEndpoint("/api/swagger/v1/swagger.json", "My API V1");
+                c.RoutePrefix = "api/swagger";
             });
 
             if (env.IsDevelopment())
