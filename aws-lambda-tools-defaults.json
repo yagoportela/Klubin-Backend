@@ -11,11 +11,12 @@
   "profile":"default",
   "region" : "us-east-1",
   "configuration": "Release",
-  "s3-prefix": "",
+  "s3-prefix": "DadosClientes/",
   "template": "serverless.template",
+  "function-runtime":"dotnetcore3.1",
   "template-parameters": "",
   "msbuild-parameters": "--self-contained true /p:AssemblyName=bootstrap",
-  "framework": "netcoreapp3.0",
-  "s3-bucket": "backend-dadosclientes",
+  "framework": "netcoreapp3.1",
+  "s3-bucket": "backend-klubin",
   "stack-name": "DadosClientes"
   }

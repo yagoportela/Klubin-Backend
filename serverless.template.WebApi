@@ -9,7 +9,7 @@
         "AspNetCoreFunction": {
             "Type": "AWS::Serverless::Function",
             "Properties": {
-                "Handler": "DadosClientes.Application::DadosClientes.Application.Services.AuthenticationApplication::Valor",
+                "Handler": "DadosClientes::DadosClientes.LambdaEntryPoint::FunctionHandlerAsync",
                 "Runtime": "dotnetcore3.1",
                 "CodeUri": "./.release/release.zip",
                 "MemorySize": 256,
@@ -17,10 +17,10 @@
                 "Policies": ["AWSLambdaFullAccess"],
                 "Environment": {
                     "Variables": {
-                        "LAMBDA_NET_SERIALIZER_DEBUG": "true",
-                        "Authorization__AppSecretKey": "md05hkuo5kudms86ab3lql6aqa3rl3m8qem0nnvqj1f4lniv0tf",
-                        "Authorization__ClientId": "3fjcgsbgmo6eorcnsraaak9ele",
-                        "Authorization__UserPoolId": "us-east-1_lygEVOumH"
+                            "LAMBDA_NET_SERIALIZER_DEBUG": "true",
+                            "AppSecretKey": "md05hkuo5kudms86ab3lql6aqa3rl3m8qem0nnvqj1f4lniv0tf",
+                            "ClientId": "3fjcgsbgmo6eorcnsraaak9ele",
+                            "UserPoolId": "us-east-1_lygEVOumH"
                           
                     }
                 },
@@ -29,8 +29,16 @@
                     "ProxyResource": {
                         "Type": "Api",
                         "Properties": {
+                            "Path": "/{proxy+}",
+                            "Method": "ANY"
+                        }
+                    },
+                    "RootResource": {
+                        "Type": "Api",
+                        "Properties": {
                             "Path": "/",
-                            "Method": "get"
+                            "Method": "ANY"
+
                         }
                     }
                 }

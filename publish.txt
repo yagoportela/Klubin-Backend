@@ -1,2 +1,2 @@
-dotnet lambda package -pl src/DadosClientes /p:GenerateRuntimeConfigurationFiles=true -o ./.release/release
+dotnet lambda package -pl src/DadosClientes.Application /p:GenerateRuntimeConfigurationFiles=true -o ./.release/release
 dotnet lambda deploy-serverless

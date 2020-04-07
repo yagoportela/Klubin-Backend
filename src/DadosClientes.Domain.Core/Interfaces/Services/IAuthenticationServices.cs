@@ -7,5 +7,6 @@ namespace DadosClientes.Domain.Core.Interfaces.Services
     {
         Task<string> Register(User user);
         Task<string> SignIn(UserLogin user);
+        string teste();
     }
 }

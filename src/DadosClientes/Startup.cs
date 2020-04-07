@@ -1,3 +1,4 @@
+using Amazon.Lambda.Core;
 using DadosClientes.Infra.CrossCutting.IoC;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -5,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+
 
 namespace DadosClientes
 {
@@ -23,9 +25,9 @@ namespace DadosClientes
             
             services.AddSingleton<IConfiguration>(Configuration);
 
-            services.AddMvcCore()                    
-                    .AddApplicationModule()
-                    .AddDependency();
+            services.AddMvcCore();             
+                    // .AddApplicationModule()
+                    // .AddDependency();
 
             services.AddControllers();
 

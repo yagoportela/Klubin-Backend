@@ -1,14 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <AWSProjectType>Lambda</AWSProjectType>
   </PropertyGroup>
   
   <ItemGroup>    
-    <ProjectReference Include="..\DadosClientes.Application\DadosClientes.Application.csproj" />
-    <ProjectReference Include="..\DadosClientes.Services\DadosClientes.Services.csproj" />
+    <ProjectReference Include="..\DadosClientes.Services\DadosClientes.Services.csproj" />    
+    <ProjectReference Include="..\DadosClientes.Domain.Core\DadosClientes.Domain.Core.csproj" />
+
   </ItemGroup>
 
   <ItemGroup>

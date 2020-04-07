@@ -1,19 +1,31 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <AWSProjectType>Lambda</AWSProjectType>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\DadosClientes.Domain.Core\DadosClientes.Domain.Core.csproj" />  
+    <ProjectReference Include="..\DadosClientes.Infra.CrossCutting.IoC\DadosClientes.Infra.CrossCutting.IoC.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Amazon.Lambda.Serialization.SystemTextJson" Version="1.0.0" />
     <PackageReference Include="AutoMapper" Version="9.0.0" />
     <PackageReference Include="Flurl.Http" Version="2.4.2" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.2.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Amazon.Lambda.AspNetCoreServer" Version="4.1.0" />
+    <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.3.101" />
+    <PackageReference Include="Amazon.Lambda.RuntimeSupport" Version="1.0.0" />
   </ItemGroup>
 
 </Project>

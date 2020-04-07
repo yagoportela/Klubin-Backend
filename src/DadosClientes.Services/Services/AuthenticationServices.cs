@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Amazon.CognitoIdentityProvider;
 using Amazon.CognitoIdentityProvider.Model;
+using DadosClientes.Domain.Core.Dto.Configuration;
 using DadosClientes.Domain.Core.Interfaces.Services;
 using DadosClientes.Domain.Core.Models;
 using Microsoft.Extensions.Configuration;
@@ -11,17 +12,13 @@ using Microsoft.Extensions.Configuration;
 namespace DadosClientes.Infra.Services.Services {
     public class AuthenticationServices : IAuthenticationServices {
 
-        private readonly IConfiguration _configuration;
-        private readonly string _clientId;
-        private readonly string _AppSecretKey;
-        private readonly string _UserPoolId;
+        private readonly Authorization _authorization;
+        public AuthenticationServices (Authorization authorization) {
+            _authorization = authorization;
+        }
 
-        public AuthenticationServices (IConfiguration configuration) {
-            _configuration = configuration;
-
-            _AppSecretKey = _configuration["Authorization:AppSecretKey"];
-            _clientId = _configuration["Authorization:ClientId"];
-            _UserPoolId = _configuration["Authorization:UserPoolId"];
+        public string teste() {
+            return "Apenas um teste";
         }
 
         public async Task<string> Register (User user) {
@@ -30,8 +27,8 @@ namespace DadosClientes.Infra.Services.Services {
                 var cognito = new AmazonCognitoIdentityProviderClient ();
 
                 var request = new SignUpRequest {
-                    ClientId = _clientId,
-                    SecretHash = GetSecretHash (user.Username, _clientId, _AppSecretKey),
+                    ClientId = _authorization.ClientId,
+                    SecretHash = GetSecretHash (user.Username, _authorization.ClientId, _authorization.AppSecretKey),
                     Password = user.Password,
                     Username = user.Username,
                 };
@@ -70,14 +67,14 @@ namespace DadosClientes.Infra.Services.Services {
                 var cognito = new AmazonCognitoIdentityProviderClient ();
 
                 var request = new AdminInitiateAuthRequest {
-                    UserPoolId = _UserPoolId,
-                    ClientId = _clientId,
+                    UserPoolId = _authorization.UserPoolId,
+                    ClientId = _authorization.ClientId,
                     AuthFlow = AuthFlowType.ADMIN_NO_SRP_AUTH,
 
                     AuthParameters = new Dictionary<string, string> { 
                         { "USERNAME", user.Username },
                         { "PASSWORD", user.Password },
-                        { "SECRET_HASH", GetSecretHash (user.Username, _clientId, _AppSecretKey) }
+                        { "SECRET_HASH", GetSecretHash (user.Username, _authorization.ClientId, _authorization.AppSecretKey) }
                     }
                 };
 

@@ -1,4 +1,4 @@
-namespace DadosClientes.Application.Dto
+namespace DadosClientes.Domain.Core.Dto.DadosClientes
 {
     public class UserLoginDTO
     {        

@@ -1,6 +1,6 @@
 using System;
 using System.Threading.Tasks;
-using DadosClientes.Application.Dto;
+using DadosClientes.Domain.Core.Dto.DadosClientes;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DadosClientes.Application.Interfaces

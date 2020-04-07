@@ -1,43 +1,42 @@
 using System.Threading.Tasks;
 using AutoMapper;
-using DadosClientes.Application.Dto;
+using DadosClientes.Application.Init;
 using DadosClientes.Application.Interfaces;
+using DadosClientes.Domain.Core.Dto.DadosClientes;
 using DadosClientes.Domain.Core.Interfaces.Services;
 using DadosClientes.Domain.Core.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace DadosClientes.Application.Services
-{
-    [ApiController]
-    [Route("api/authentication")]
-    public class AuthenticationApplication : ControllerBase, IAuthenticationApplication
-    {
+namespace DadosClientes.Application.Services {
+
+    public class AuthenticationApplication: IAuthenticationApplication {
         private readonly IAuthenticationServices _authenticationServices;
         private readonly IMapper _mapper;
 
-        public AuthenticationApplication(IMapper mapper,
-                                         IAuthenticationServices authenticationServices) {
+        public AuthenticationApplication () : this (ApiServices.ServiceProvider.GetService<IMapper>(),
+                                                    ApiServices.ServiceProvider.GetService<IAuthenticationServices>()) { }
+
+        public AuthenticationApplication (IMapper mapper,
+                                          IAuthenticationServices authenticationServices) {
             _mapper = mapper;
-            _authenticationServices = authenticationServices ;
+            _authenticationServices = authenticationServices;
         }
 
-        [HttpPost]
-        [Route("register")]
-        public async Task<ActionResult<string>> Register(UserDTO userDto)
-        {            
-            var user = _mapper.Map<User>(userDto);
-            var register = await _authenticationServices.Register(user);
+        public string Valor () {            
+            return _authenticationServices.teste();;
+        }
+
+        public async Task<ActionResult<string>> Register ([FromBody] UserDTO userDto) {
+            var user = _mapper.Map<User> (userDto);
+            var register = await _authenticationServices.Register (user);
             return register;
         }
-
-        [HttpPost]
-        [Route("signin")]
-        public async Task<ActionResult<string>> SignIn([FromBody]UserLoginDTO userLoginDto)
-        {
-            var userLogin = _mapper.Map<UserLogin>(userLoginDto);
-            var register = await _authenticationServices.SignIn(userLogin);
-            return Ok(register);
+        
+        public async Task<ActionResult<string>> SignIn ([FromBody] UserLoginDTO userLoginDto) {
+            var userLogin = _mapper.Map<UserLogin> (userLoginDto);
+            var register = await _authenticationServices.SignIn (userLogin);
+            return register;
         }
     }
 }
