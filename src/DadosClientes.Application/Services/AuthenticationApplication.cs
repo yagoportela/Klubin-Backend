@@ -10,7 +10,8 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace DadosClientes.Application.Services {
 
-    public class AuthenticationApplication: IAuthenticationApplication {
+    [ApiController]
+    public class AuthenticationApplication: ControllerBase, IAuthenticationApplication {
         private readonly IAuthenticationServices _authenticationServices;
         private readonly IMapper _mapper;
 
@@ -22,9 +23,15 @@ namespace DadosClientes.Application.Services {
             _mapper = mapper;
             _authenticationServices = authenticationServices;
         }
-
-        public string Valor () {            
-            return _authenticationServices.teste();;
+        public object Valor () {      
+            var resultado = new {
+                    isBase64Encoded= false,
+                    statusCode= 200,
+                    headers= new { headerName= "headerValue"},
+                    body= _authenticationServices.teste()
+                };
+                
+             return resultado;
         }
 
         public async Task<ActionResult<string>> Register ([FromBody] UserDTO userDto) {

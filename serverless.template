@@ -5,7 +5,51 @@
     "Parameters": {},
     "Conditions": {},
     "Resources": {
-
+        "AspNetCoreFunctionRole": {
+            "Type": "AWS::IAM::Role",
+            "Description": "Role ApiGateway com Lambda",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Action": [
+                                "sts:AssumeRole"
+                            ],
+                            "Principal": {
+                                "Service": [
+                                    "lambda.amazonaws.com"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                "ManagedPolicyArns": [
+                    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+                ]
+            }
+        },
+        "lambdaApiGatewayInvoke": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+                "Action": "lambda:InvokeFunction",
+                "FunctionName": {
+                    "Fn::GetAtt": [
+                        "AspNetCoreFunction",
+                        "Arn"
+                    ]
+                },
+                "Principal": "apigateway.amazonaws.com"
+            }
+        },
+        "apiGateway": {
+            "Type": "AWS::Serverless::Api",
+            "Properties": {
+                "Name": "my-api",
+                "StageName": "Staging"
+            }
+        },
         "AspNetCoreFunction": {
             "Type": "AWS::Serverless::Function",
             "Properties": {
@@ -14,7 +58,12 @@
                 "CodeUri": "./.release/release.zip",
                 "MemorySize": 256,
                 "Timeout": 30,
-                "Policies": ["AWSLambdaFullAccess"],
+                "Role": {
+                    "Fn::GetAtt": [
+                        "AspNetCoreFunctionRole",
+                        "Arn"
+                    ]
+                },
                 "Environment": {
                     "Variables": {
                         "LAMBDA_NET_SERIALIZER_DEBUG": "true",
@@ -28,9 +77,11 @@
                 "Events": {
                     "ProxyResource": {
                         "Type": "Api",
+                        "authorizationType": "NONE",
                         "Properties": {
-                            "Path": "/",
-                            "Method": "get"
+                            "RestApiId":{"Ref": "apiGateway"},
+                            "Path": "/api/valor",
+                            "Method": "GET"
                         }
                     }
                 }
@@ -41,7 +92,7 @@
         "ApiURL": {
           "Description": "API endpoint URL for Prod environment",
           "Value": {
-            "Fn::Sub": "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com"
+            "Fn::Sub": "https://${apiGateway}.execute-api.${AWS::Region}.amazonaws.com"
           }
         }
       }

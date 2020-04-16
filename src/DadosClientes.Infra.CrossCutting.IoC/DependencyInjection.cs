@@ -8,18 +8,21 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace DadosClientes.Infra.CrossCutting.IoC {
     public static class DependencyInjection {
-        public static void ConfigureServices (IServiceCollection builder) {
+        public static void ConfigureMapper (IServiceCollection builder) {
+
+            builder.AddMvc(options =>
+            {
+                options.RequireHttpsPermanent = true; 
+                options.RespectBrowserAcceptHeader = true;
+            });
+
             var mappingConfig = new MapperConfiguration (mc => {
                 mc.AddProfile (new AutoMapper ());
             });
 
             IMapper mapper = mappingConfig.CreateMapper ();
 
-            builder.AddSingleton (mapper);
-            builder.AddSingleton<Authorization> (Configuration.GetConfiguration()
-                                                              .GetSection("Authorization")
-                                                              .Get<Authorization>());
-            
+            builder.AddSingleton (mapper);            
 
         }
 
@@ -27,24 +30,13 @@ namespace DadosClientes.Infra.CrossCutting.IoC {
             builder.AddTransient<IAuthenticationServices, AuthenticationServices> ();
         }
 
-        public static void ConfigurationEnvironment (IServiceCollection builder) {
-
-            
-            builder.AddSingleton<Authorization> (Configuration.GetConfiguration().GetSection("").Get<Authorization>());
+        public static void ConfigurationEnvironment (IServiceCollection builder) {            
+            builder.AddSingleton<Authorization> (Configuration.GetConfiguration()
+                                                              .GetSection("Authorization")
+                                                              .Get<Authorization>());
 
         }
 
     }
 
-    public static class Configuration {
-        public static IConfiguration GetConfiguration () {
-            var teste = Directory.GetCurrentDirectory ();
-            return new ConfigurationBuilder ()
-                .SetBasePath (Directory.GetCurrentDirectory ())
-                .AddJsonFile ("appsettings.json", optional : false, reloadOnChange : true)
-                .AddEnvironmentVariables ()
-                .Build ();
-        }
-
-    }
 }

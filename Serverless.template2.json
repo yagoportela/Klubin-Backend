@@ -1,0 +1,141 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Transform": "AWS::Serverless-2016-10-31",
+    "Description": "Registro e Login.",
+    "Parameters": {
+        "lambdaFunctionName": {
+            "Type": "String",
+            "AllowedPattern": "^[a-zA-Z0-9]+[a-zA-Z0-9-]+[a-zA-Z0-9]+$",
+            "Default": "my-function"
+        }
+    },
+    "Resources": {
+        "AspNetCoreFunctionRole": {
+            "Type": "AWS::IAM::Role",
+            "Description": "Role ApiGateway com Lambda",
+            "Properties": {
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Action": [
+                                "sts:AssumeRole"
+                            ],
+                            "Principal": {
+                                "Service": [
+                                    "lambda.amazonaws.com"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                "ManagedPolicyArns": [
+                    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+                ]
+            }
+        },
+        "AspNetCoreFunction": {
+            "Type": "AWS::Serverless::Function",
+            "Properties": {
+                "Handler": "DadosClientes.Application::DadosClientes.Application.Services.AuthenticationApplication::Valor",
+                "Runtime": "dotnetcore3.1",
+                "CodeUri": "./.release/release.zip",
+                "MemorySize": 256,
+                "Timeout": 30,
+                "FunctionName": {
+                    "Ref": "lambdaFunctionName"
+                },
+                "Role": {
+                    "Fn::GetAtt": [
+                        "AspNetCoreFunctionRole",
+                        "Arn"
+                    ]
+                },
+                "Environment": {
+                    "Variables": {
+                        "LAMBDA_NET_SERIALIZER_DEBUG": "true",
+                        "Authorization__AppSecretKey": "md05hkuo5kudms86ab3lql6aqa3rl3m8qem0nnvqj1f4lniv0tf",
+                        "Authorization__ClientId": "3fjcgsbgmo6eorcnsraaak9ele",
+                        "Authorization__UserPoolId": "us-east-1_lygEVOumH"
+                    }
+                }
+            }
+        },
+        "apiGateway": {
+            "Type": "AWS::Serverless::Api",
+            "Properties": {
+                "Name": "my-api",
+                "StageName": "Staging",
+                "Description": "My API"
+            }
+        },
+        "ProxyResource": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+                "RestApiId": {
+                    "Ref": "AspNetCoreFunction"
+                },
+                "ParentId": {
+                    "Fn::GetAtt": [
+                        "AspNetCoreFunction",
+                        "arn"
+                    ]
+                },
+                "PathPart": "{proxy+}"
+            }
+        },
+        "lambdaApiGatewayInvoke": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+                "Action": "lambda:InvokeFunction",
+                "FunctionName": {
+                    "Fn::GetAtt": [
+                        "AspNetCoreFunction",
+                        "Arn"
+                    ]
+                },
+                "Principal": "apigateway.amazonaws.com",
+                "SourceArn": {
+                    "Fn::Sub": "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${apiGateway}/*"
+                }
+            }
+        },
+        "MockMethod": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+                "OperationName": "/Prod/api/values",
+                "HttpMethod": "ANY",
+                "AuthorizationType": "NONE",
+                "Integration": {
+                    "IntegrationHttpMethod": "GET",
+                    "Type": "AWS_PROXY",
+                    "Uri": {
+                        "Fn::Sub": [
+                            "arn:aws:apigateway:${AWS::Region}:lambda:path/2020-04-10/functions/${AspNetCoreFunction.Arn}/invocations",
+                            {
+                                "lambdaArn": {
+                                    "Ref": "AspNetCoreFunction"
+                                }
+                            }
+                        ]
+                    }
+                },
+                "ResourceId": {
+                    "Ref": "ProxyResource"
+                },
+                "RestApiId": {
+                    "Ref": "apiGateway"
+                }
+            }
+        }
+    },
+    "Outputs": {
+        "ApiURL": {
+            "Description": "API endpoint URL for Prod environment",
+            "Value": {
+                "Fn::Sub": "https://${apiGateway}.execute-api.${AWS::Region}.amazonaws.com"
+            }
+        }
+    }
+}

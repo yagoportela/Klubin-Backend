@@ -18,7 +18,7 @@ namespace DadosClientes.Infra.Services.Services {
         }
 
         public string teste() {
-            return "Apenas um teste";
+            return _authorization.ClientId;
         }
 
         public async Task<string> Register (User user) {
